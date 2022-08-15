@@ -34,4 +34,33 @@ int main() {
 }
 ```
 
+```cpp
+// Nonblocking client acceptance
+
+static void onconnect(server& sv, std::shared_ptr<client>& cl) {
+	printf("Client connected: %s\n", cl->addr().c_str());
+}
+
+int main() {
+	server sv(1818, 3);
+	sv.nonblocking(1);
+	sv.set_onconnect(onconnect);
+	size_t cmd = 0;
+	
+	static const auto& messages = clc_messages();
+	
+	while (sv.is_open()) {
+		sv.update();
+		for (size_t i = 0; i < sv.size(); i++) {
+			auto& cl = sv[i];
+			cmd = 0;
+			cl >> cmd;
+			if (cmd >= messages.size())
+				continue;
+			messages[cmd](sv, cmd, cl);
+		}
+	}
+}
+```
+
 ## console
