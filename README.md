@@ -9,7 +9,7 @@ Both the client and server classes were intended to be easily mutable.
 Client TCP connections are handled by first defining a 'client' type variable. Make sure that it gets destructed eventually by delete or going out of scope.
 See: client/cl_main.cpp
 
-To connect a client, I recommend enabling blocking then using the 'connect' method with a string ipv4 and 16 bit host port/service.
+To connect a client, I recommend enabling blocking (enabled upon initialization), then using the 'connect' method with a string ipv4 and 16 bit host port/service.
 After connection, the 'is_open' method will return true as long as the internal socket is not invalidated by closure.
 
 ## server
