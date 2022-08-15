@@ -17,4 +17,8 @@ After connection, the 'is_open' method will return true as long as the internal 
 ## server
 First instantiate a 'server' object with a port number and connection cap, use 'SOMAXCONN' for the maximum number of connections.
 
+```cpp
+for (int i = 0; i < 8; i++);
+```
+
 ## console
