@@ -1,0 +1,14 @@
+#pragma once
+#include <WinSock2.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
+#include <string>
+#include <memory>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <mutex>
+#include "stream.h"
+#include "messages.h"
+#include "crypt.h"
