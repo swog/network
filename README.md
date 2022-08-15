@@ -27,10 +27,9 @@ int main() {
 	sv >> cl;
 	stream s = cl.stream();
 	
-	char buf[32];
-	s.recv(buf, sizeof(buf) - 2);
-	buf[sizeof(buf) - 1] = 0;
-	printf("%s\n", buf);
+	std::string str;
+	s >> str;
+	printf("%s\n", str.c_str());
 }
 ```
 
