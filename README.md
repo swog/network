@@ -18,7 +18,20 @@ After connection, the 'is_open' method will return true as long as the internal 
 First instantiate a 'server' object with a port number and connection cap, use 'SOMAXCONN' for the maximum number of connections.
 
 ```cpp
-for (int i = 0; i < 8; i++);
+// Blocking client acceptance:
+
+int main() {
+	server sv(1818, 3);
+	
+	client cl;
+	sv >> cl;
+	stream s = cl.stream();
+	
+	char buf[32];
+	s.recv(buf, sizeof(buf) - 2);
+	buf[sizeof(buf) - 1] = 0;
+	printf("%s\n", buf);
+}
 ```
 
 ## console
