@@ -53,6 +53,7 @@ int main() {
 	
 	static const auto& messages = clc_messages();
 	
+	// This is an infinite loop.
 	while (sv.is_open()) {
 		sv.update();
 		for (size_t i = 0; i < sv.size(); i++) {
@@ -68,4 +69,4 @@ int main() {
 ```
 
 ## console
-Text console input and command parser. Initialized/instantiated by `get_console`. 
+Text console input and command parser. Initialized/instantiated by `get_console`. When calling the static function `console::exec`, the console parses the command in the executing thread, then queues it to be executed in an internal list. Upon `console::flush`, which is to be called any time during the `is_open` loop.
