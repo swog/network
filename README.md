@@ -68,3 +68,4 @@ int main() {
 ```
 
 ## console
+Text console input and command parser. Initialized/instantiated by `get_console`.
