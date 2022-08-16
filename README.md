@@ -1,7 +1,8 @@
 # network
-Nonblocking server and client with nonblocking console input.
+Nonblocking server and client with nonblocking console input for Windows.
+Originally a network system that was built upon as an example.
 
-Note that there are many additions made to apply the networking library. For example, linkage requires that the client/server object be exposed globally. To do this, I included the functions: 'get_client', 'get_server'. Additionally, 'get_console' is defined by the console system.
+Note that there are many additions made to apply the networking library. For example, linkage requires that the client/server object be exposed globally. To do this, I included the functions: `get_client`, `get_server`. Additionally, `get_console` is defined by the console system.
 
 Socket errors are printed to stdout.
 
@@ -52,6 +53,7 @@ int main() {
 	
 	static const auto& messages = clc_messages();
 	
+	// This is an infinite loop.
 	while (sv.is_open()) {
 		sv.update();
 		for (size_t i = 0; i < sv.size(); i++) {
@@ -67,3 +69,6 @@ int main() {
 ```
 
 ## console
+Text console input and command parser. Initialized/instantiated by `get_console`. When calling the static function `console::exec`, the console parses the command in the executing thread, then queues it to be executed in an internal list. Upon `console::flush`, which is to be called any time during the `is_open` loop.
+
+Text console input is handled in a different thread, which runs concurrently with the updator thread. The console system processes input with `ReadConsoleInput` to read from the input record.
