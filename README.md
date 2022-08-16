@@ -2,7 +2,7 @@
 Nonblocking server and client with nonblocking console input.
 Originally a network system that was built upon as an example.
 
-Note that there are many additions made to apply the networking library. For example, linkage requires that the client/server object be exposed globally. To do this, I included the functions: 'get_client', 'get_server'. Additionally, 'get_console' is defined by the console system.
+Note that there are many additions made to apply the networking library. For example, linkage requires that the client/server object be exposed globally. To do this, I included the functions: `get_client`, `get_server`. Additionally, `get_console` is defined by the console system.
 
 Socket errors are printed to stdout.
 
@@ -68,4 +68,4 @@ int main() {
 ```
 
 ## console
-Text console input and command parser. Initialized/instantiated by `cpp get_console`.
+Text console input and command parser. Initialized/instantiated by `get_console`. 
