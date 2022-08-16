@@ -71,4 +71,4 @@ int main() {
 ## console
 Text console input and command parser. Initialized/instantiated by `get_console`. When calling the static function `console::exec`, the console parses the command in the executing thread, then queues it to be executed in an internal list. Upon `console::flush`, which is to be called any time during the `is_open` loop.
 
-Text console input is handled in a different thread, which runs concurrently with the updator thread. The console system processes input with `ReadConsoleInput` to read from the input record.
+Text console input is handled in a different thread, which runs concurrently with the updator thread. The console system processes input with `ReadConsoleInput` to read from the input record. It supports directional arrow keys to walk input history, as well as the input line. Input is only coded for "insertion" mode (the best).
