@@ -1,2 +1,11 @@
-﻿  console.cpp
+﻿  stdafx.cpp
+  console.cpp
+  crypt.cpp
+  net.cpp
+  stream.cpp
+  cl_commands.cpp
+  cl_main.cpp
+  cl_messages.cpp
+  client.cpp
+  Generating Code...
   client.vcxproj -> D:\source\source\repos\network\x64\Debug\client.exe

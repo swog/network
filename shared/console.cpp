@@ -248,7 +248,7 @@ static void console_var_f(command_args& args) {
 // Console instance section
 // 
 //=============================================================================
-std::vector<command_args> console::_queue;
+std::queue<command_args> console::_queue;
 
 // Set the `open` variable to 0.
 // Join the other thread to this one.
@@ -476,15 +476,18 @@ void console::exec(const char* cmdstr) {
 	command_args args(cmdstr);
 	// If the command is found, queue it
 	if (args.cmd)
-		_queue.push_back(args);
+		_queue.push(args);
 }
 
 // Execute and flush commands
 // Called from the main thread
 void console::flush() {
-	for (auto& args : console::_queue)
-		args.cmd->execute(args);
-	console::_queue.clear();
+	while (_queue.size()) {
+		auto& args = _queue.front();
+		if (args.cmd)
+			args.cmd->execute(args);
+		_queue.pop();
+	}
 #ifdef _SERVER
 	if (sv_con_isrcon()) {
 		sv_con_setrcon(0);
