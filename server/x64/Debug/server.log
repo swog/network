@@ -1,13 +1,2 @@
-﻿  stdafx.cpp
-  console.cpp
-  crypt.cpp
-  net.cpp
-  stream.cpp
-  server.cpp
-  sv_commands.cpp
-  sv_main.cpp
-  sv_messages.cpp
-  sv_rcon.cpp
-  whitelist.cpp
-  Generating Code...
+﻿  console.cpp
   server.vcxproj -> D:\source\source\repos\network\x64\Debug\server.exe

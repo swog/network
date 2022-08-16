@@ -72,8 +72,8 @@ void con_printf(const char* format, ...) {
 
 CONSOLE_COMMAND(list, "List all available commands", 0) {
 	con_printf("Commands:\n");
-	// Width is unsigned char so that an attacker somehow could 
-	//	create a command whose name length overflows format_string.
+	//	Width is unsigned char so that an attacker somehow could 
+	// create a command whose name length overflows format_string.
 	// "%255s - %s" is not greater than 31 characters.
 	unsigned char width = 0, len;
 	for (console_command* com = console::_head; com; com = com->_next) {
@@ -221,8 +221,8 @@ void console_var::set_value(const std::string& str) {
 }
 
 static void console_var_f(command_args& args) {
-	// Weird error where a command has the callback for a variable,
-	//	but is not a variable
+	//	Weird error where a command has the callback for a variable,
+	// but is not a variable.
 	if (!args.cmd->is_var()) {
 		con_printf("Console command %s has varfn but is not var!\n", args.cmd->name());
 		return;
@@ -386,8 +386,7 @@ void console::backspace() {
 }
 
 void console::tab() {
-	static std::string cmdname;
-	cmdname.clear();
+	std::string cmdname;
 	for (size_t i = 0; i < strlen(_input) && 
 		i < sizeof(_input) && _input[i] != ' '; i++)
 		cmdname.push_back(_input[i]);
