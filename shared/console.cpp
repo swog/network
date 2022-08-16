@@ -248,6 +248,7 @@ static void console_var_f(command_args& args) {
 // Console instance section
 // 
 //=============================================================================
+std::mutex console::_queue_mut;
 std::queue<command_args> console::_queue;
 
 // Set the `open` variable to 0.
@@ -475,13 +476,16 @@ void console::exec(const char* cmdstr) {
 	// Tokenize in this thread
 	command_args args(cmdstr);
 	// If the command is found, queue it
-	if (args.cmd)
+	if (args.cmd) {
+		std::lock_guard<std::mutex> lock(_queue_mut);
 		_queue.push(args);
+	}
 }
 
 // Execute and flush commands
 // Called from the main thread
 void console::flush() {
+	std::lock_guard<std::mutex> lock(_queue_mut);
 	while (_queue.size()) {
 		auto& args = _queue.front();
 		if (args.cmd)

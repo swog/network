@@ -241,5 +241,6 @@ private:
 	static console_command* find_cmd(const char* name);
 
 	static console_command* _head;
+	static std::mutex _queue_mut;
 	static std::queue<command_args> _queue;
 };
