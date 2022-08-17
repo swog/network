@@ -11,15 +11,18 @@
 static std::mutex _con_rcon_exec_mut;
 static bool _con_rcon_exec = false;
 // Queue, if there are multiple rcon executers
+static std::mutex _con_log_mut;
 static std::queue<std::weak_ptr<client>> _con_log;
 
 // Set log client thru svc_print
 void sv_con_log(std::shared_ptr<client> cl) {
+	std::lock_guard<std::mutex> lock(_con_log_mut);
 	_con_log.push(cl);
 }
 
 void sv_con_unlog() {
-	if (_con_log.size())
+	std::lock_guard<std::mutex> lock(_con_log_mut);
+	if (!_con_log.empty())
 		_con_log.pop();
 }
 
@@ -54,6 +57,7 @@ void con_printf(const char* format, ...) {
 
 	// Lock the shared ptr from the front of the rcon console log recipients
 	// AKA. the first log recipient client.
+	std::lock_guard<std::mutex> lock(_con_log_mut);
 	std::shared_ptr<client> cl;
 	if (_con_log.size()) {
 		cl = _con_log.front().lock();
