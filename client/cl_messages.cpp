@@ -1,45 +1,46 @@
 #include "stdafx.h"
 #include "client.h"
 #include "console.h"
+#include "messages.h"
 
 serverinfodata& get_serverinfo() {
 	static serverinfodata _serverinfo;
 	return _serverinfo;
 }
 
-static void svc_nop_f(client& cl, size_t cmd) {
+NET_MESSAGE_TCP(svc_nop) {
 }
 
 // close net message received from server
-static void svc_exit_f(client& cl, size_t cmd) {
+NET_MESSAGE_TCP(svc_exit) {
 	std::string reason;
-	cl.stream() >> reason;
+	cl.stream().tcp_recv(reason);
 	con_printf("Connection closing: %s\n", reason.c_str());
 	cl.close();
 }
 
 // execute command from server
-static void svc_exec_f(client& cl, size_t cmd) {
+NET_MESSAGE_TCP(svc_exec) {
 	std::string cmdstr;
-	cl.stream() >> cmdstr;
+	cl.stream().tcp_recv(cmdstr);
 	con_printf("Executing command from server: %s\n", cmdstr.c_str());
 	console::exec(cmdstr.c_str());
 }
 
 // print message to console
-static void svc_print_f(client& cl, size_t cmd) {
+NET_MESSAGE_TCP(svc_print) {
 	std::string str;
-	cl.stream() >> str;
+	cl.stream().tcp_recv(str);
 	con_printf("%s", str.c_str());
 }
 
-static void svc_serverinfo_f(client& cl, size_t cmd) {
+NET_MESSAGE_TCP(svc_serverinfo) {
 	auto& svi = get_serverinfo();
-	auto s = cl.stream();
-	s >> svi.name;
-	s >> svi.motd;
-	s >> svi.numclients;
-	s >> svi.maxclients;
+	auto& s = cl.stream();
+	s.tcp_recv(svi.name);
+	s.tcp_recv(svi.motd);
+	s.tcp_recv(svi.numclients);
+	s.tcp_recv(svi.maxclients);
 
 	con_printf("Connected to %s\n", svi.name.c_str());
 
@@ -48,27 +49,24 @@ static void svc_serverinfo_f(client& cl, size_t cmd) {
 	}
 }
 
-std::vector<svc_msgfn>& svc_messages() {
-	static std::vector<svc_msgfn> msgs = {
-		svc_nop_f, svc_exit_f, svc_exec_f,
-		svc_print_f, svc_serverinfo_f
-	};
-	return msgs;
-}
+std::vector<net_message*> svc_messages = {
+	&svc_nop_inst, &svc_exit_inst, &svc_exec_inst,
+	&svc_print_inst, &svc_serverinfo_inst
+};
 
 // Send a NOP to keep alive
 void cl_nop() {
 	auto& cl = get_client();
-	auto s = cl.stream();
-	s << clc_nop;
-	s.flush();
+	auto& s = cl.stream();
+	s.tcp_send(clc_nop);
+	s.tcp_flush();
 }
 
 // Send an exit, reasons aren't allowed
 void cl_exit() {
 	auto& cl = get_client();
-	auto s = cl.stream();
-	s << clc_exit;
-	s.flush();
+	auto& s = cl.stream();
+	s.tcp_send(clc_exit);
+	s.tcp_flush();
 	cl.close();
 }

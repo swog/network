@@ -11,5 +11,4 @@
 #include <mutex>
 #include <queue>
 #include "stream.h"
-#include "messages.h"
 #include "crypt.h"

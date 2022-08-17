@@ -1,16 +1,17 @@
 #include "stdafx.h"
 #include "console.h"
 #include "client.h"
+#include "messages.h"
 #include "net.h"
 
 // clientside exit command
 // notify server
 CONSOLE_COMMAND(exit, "Close program", 0) {
 	auto& cl = get_client();
-	auto s = cl.stream();
+	auto& s = cl.stream();
 
-	s << clc_exit;
-	s.flush();
+	s.tcp_send(clc_exit);
+	s.tcp_flush();
 
 	get_console().set_open(0);
 	cl.close();
@@ -23,9 +24,9 @@ CONSOLE_COMMAND(rcon_password, "Authenticate with server", 0) {
 		return;
 	}
 	size_t size = min(args[1].size(), RCON_PASS_SIZE - 1);
-	auto s = get_client().stream();
-	s << clc_rcon_password;
-	s << size;
+	auto& s = get_client().stream();
+	s.tcp_send(clc_rcon_password);
+	s.tcp_send(size);
 	net_send_xor(s, args[1].c_str(), size,
 		RCON_PASS_KEY, RCON_PASS_KEY_SIZE);
 	s.flush();
@@ -38,9 +39,9 @@ CONSOLE_COMMAND(rcon, "Type rcon for help", 0) {
 		con_printf("For the command to be executed, the client must first authenticate with rcon_password.\n");
 		return;
 	}
-	auto s = get_client().stream();
-	s << clc_rcon;
-	s << args.argstr;
+	auto& s = get_client().stream();
+	s.tcp_send(clc_rcon);
+	s.tcp_send(args.argstr);
 	s.flush();
 }
 

@@ -17,7 +17,7 @@ typedef void (*console_commandfn)(class command_args& args);
 
 #ifdef _SERVER
 // Set log client thru svc_print
-void sv_con_log(std::shared_ptr<client> cl);
+void sv_con_log(std::shared_ptr<class client> cl);
 void sv_con_unlog();
 
 void sv_con_setrcon(bool rcon);

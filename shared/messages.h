@@ -38,18 +38,80 @@ enum svc_message : size_t {
 	svc_serverinfo,	// Server information
 };
 
-typedef void (*svc_msgfn)(class client& cl, size_t cmd);
-typedef void (*clc_msgfn)(class server& sv, size_t cmd, std::shared_ptr<client> cl);
+class net_message {
+public:
+	net_message() {
+		_id = 0;
+	}
+
+	virtual const char* name() const = 0;
+#ifdef _SERVER
+	virtual void process(class server& sv, std::shared_ptr<class client> cl) = 0;
+#else
+	virtual void process(class client& cl) = 0;
+#endif
+
+	virtual size_t protocol() const = 0;
+
+	// clc_*/svc_*
+	const size_t& identifier() const {
+		return _id;
+	}
+
+	size_t _id;
+};
+
+#ifdef _SERVER
+#define NET_MESSAGE(_name, _proto) \
+	class _name##_handler : public net_message { \
+	public: \
+		_name##_handler() { \
+			_id = _name; \
+		} \
+		virtual const char* name() const { \
+			return #_name; \
+		} \
+		virtual void process(class server& sv, std::shared_ptr<client> cl); \
+		virtual size_t protocol() const { \
+			return _proto; \
+		} \
+	} _name##_inst; \
+	void _name##_handler::process(server& sv, std::shared_ptr<client> cl)
+#else
+#define NET_MESSAGE(_name, _proto) \
+	class _name##_handler : public net_message { \
+	public: \
+		_name##_handler() { \
+			_id = _name; \
+		} \
+		virtual const char* name() const { \
+			return #_name; \
+		} \
+		virtual void process(client& cl); \
+		virtual size_t protocol() const { \
+			return _proto; \
+		} \
+	} _name##_inst; \
+	void _name##_handler::process(client& cl)
+#endif
+
+#define NET_MESSAGE_TCP(_name) NET_MESSAGE(_name, IPPROTO_TCP)
+#define NET_MESSAGE_UDP(_name) NET_MESSAGE(_name, IPPROTO_UDP)
+
+#define DECLARE_NET_MESSAGE(_name) \
+	extern class _name##_handler _name##_inst
 
 serverinfodata& get_serverinfo();
 
 #ifdef _SERVER
 // Receive RCON command
-void clc_rcon_f(server& sv, size_t cmd, std::shared_ptr<client> cl);
+DECLARE_NET_MESSAGE(clc_rcon);
 // Receive RCON password
-void clc_rcon_password_f(class server& sv, size_t cmd, std::shared_ptr<client> cl);
+DECLARE_NET_MESSAGE(clc_rcon_password);
 
-std::vector<clc_msgfn>& clc_messages();
+#define net_messages clc_messages
+
+extern std::vector<net_message*> clc_messages;
 
 // Send a NOP to keep alive
 void sv_nop(std::shared_ptr<client> cl);
@@ -59,7 +121,9 @@ void sv_kick(std::shared_ptr<client> cl, const char* reason = NULL);
 // Does not print a newline character on the client, so include it.
 void sv_printf(std::shared_ptr<client> cl, const char* format, ...);
 #else
-std::vector<svc_msgfn>& svc_messages();
+extern std::vector<net_message*> svc_messages;
+
+#define net_messages svc_messages
 
 // Send a NOP to keep alive
 void cl_nop();

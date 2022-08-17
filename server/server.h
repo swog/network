@@ -37,14 +37,10 @@ public:
 	client();
 	client(SOCKET so, struct sockaddr_in addr);
 
-	stream stream() {
-		return *this;
-	}
-
 	void close();
 
 	bool is_open() const {
-		return _so != INVALID_SOCKET;
+		return _tcp != INVALID_SOCKET && _udp != INVALID_SOCKET;
 	}
 
 	std::string addr() const;
@@ -61,8 +57,26 @@ public:
 		return _uid;
 	}
 
+	stream& stream() {
+		return _stream;
+	}
+
+	void tcp_flush(class stream& s) {
+		s.tcp_flush();
+		ext().last_send = time(NULL);
+	}
+
+	void udp_flush(class stream& s) {
+		s.udp_flush();
+		ext().last_send = time(NULL);
+	}
+
+	void update() {
+		_stream.update();
+	}
+
 private:
-	SOCKET _so;
+	SOCKET _tcp, _udp;
 	struct sockaddr_in _addr;
 	client_ext _ext;
 	size_t _uid;		// Unique identifier.
@@ -70,6 +84,7 @@ private:
 						// However, I think that leaking the socket descriptor
 						//	could lead to vulnerability chaining
 						// So we create one based on the connection time
+	class stream _stream;
 };
 
 typedef void (*clc_confn)(class server& sv, std::shared_ptr<client> cl);
@@ -92,6 +107,8 @@ typedef void (*clc_confn)(class server& sv, std::shared_ptr<client> cl);
 //	}
 class server {
 public:
+	friend class client;
+
 	~server();
 	server(int port, int maxconn);
 
@@ -101,13 +118,12 @@ public:
 
 	void close();
 	bool is_open() const {
-		return _so != INVALID_SOCKET;
+		return _tcp != INVALID_SOCKET && _udp != INVALID_SOCKET;
 	}
 
 	void update();
 	void nonblocking(bool nb);
-
-	client& operator>>(client& cli);
+	
 	// Remove client from connection list
 	void remove(std::shared_ptr<client> cl);
 
@@ -135,7 +151,7 @@ public:
 	}
 
 private:
-	SOCKET _so;
+	SOCKET _tcp, _udp;
 	std::vector<std::shared_ptr<client>> _cons;
 	clc_confn _oncon;
 };

@@ -2,12 +2,12 @@
 #include "server.h"
 #include "console.h"
 #include "whitelist.h"
+#include "messages.h"
 
 #define SERVER_PORT 1215
 #define SERVER_MAXCON 8
 #define SERVER_NAME "Example Server"
 #define SERVER_MOTD "Sample MOTD\n"
-#define SERVER_TIMEOUT 20
 
 // global to get server reference
 server& get_server() {
@@ -37,13 +37,13 @@ static void sv_oncon(server& sv, std::shared_ptr<client> cl) {
 	
 	// Send server info
 	auto& svi = get_serverinfo();
-	auto s = cl->stream();
-	s << svc_serverinfo;
-	s << svi.name;
-	s << svi.motd;
-	s << svi.numclients;
-	s << svi.maxclients;
-	s.flush();
+	auto& s = cl->stream();
+	s.tcp_send(svc_serverinfo);
+	s.tcp_send(svi.name);
+	s.tcp_send(svi.motd);
+	s.tcp_send(svi.numclients);
+	s.tcp_send(svi.maxclients);
+	cl->tcp_flush(s);
 }
  
 static void options(int argc, char **argv) {
@@ -60,42 +60,10 @@ int main(int argc, char **argv) {
 	sv.set_onconnect(sv_oncon);
 	get_console();
 
-	int num = 0;
-	size_t cmd;
-	const auto& messages = clc_messages();
-	time_t tim;
+	const auto& messages = clc_messages;
 
 	while (sv.is_open()) {
-		sv.update();
-
-		for (size_t i = 0; i < sv.size(); i++) {
-			auto& con = sv[i];
-			auto s = con->stream();
-			cmd = 0;
-			num = s >> cmd;
-			tim = time(NULL);
-			// Send NOP if client is about to timeout
-			// Send it here to ensure that it gets sent even if we havent recv in a while.
-			if (tim - con->ext().last_send >= SERVER_TIMEOUT - 10)
-				sv_nop(con);
-			if (num <= 0) {
-				// If there's no bytes read, and its timed out: kick.
-				if (tim - con->ext().last_recv >= SERVER_TIMEOUT)
-					sv_kick(con, "Timed out");
-				continue;
-			}
-			// We received a byte
-			con->ext().last_recv = tim;
-			// Number of bytes isnt the size of a command, wait...
-			if (num != sizeof(cmd))
-				continue;
-			if (cmd >= messages.size()) {
-				con_printf("Message out of bounds %llu (%i) %s\n", cmd, num, con->addr().c_str());
-				continue;
-			}
-			messages[cmd](sv, cmd, con);
-		}
-
 		console::flush();
+		sv.update();
 	}
 }

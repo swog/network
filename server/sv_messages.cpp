@@ -1,39 +1,40 @@
 #include "stdafx.h"
 #include "server.h"
 #include "console.h"
+#include "messages.h"
 #include "net.h"
 
-static void clc_nop_f(server& sv, size_t cmd, std::shared_ptr<client> cl) {
+NET_MESSAGE_TCP(clc_nop) {
 }
 
 // exit message from client
 // no custom message
-static void clc_exit_f(server& sv, size_t cmd, std::shared_ptr<client> cl) {
+NET_MESSAGE_TCP(clc_exit) {
 	con_printf("Client disconnected: %s\n", cl->addr().c_str());
 	sv.remove(cl);
 }
 
-std::vector<clc_msgfn>& clc_messages() {
-	static std::vector<clc_msgfn> msgs = {
-		clc_nop_f, clc_exit_f, clc_rcon_f, clc_rcon_password_f
-	};
-	return msgs;
-}
+std::vector<net_message*> clc_messages = {
+	(net_message*)&clc_nop_inst,
+	(net_message*)&clc_exit_inst,
+	(net_message*)&clc_rcon_inst,
+	(net_message*)&clc_rcon_password_inst
+};
 
 // Send a NOP to keep alive
 void sv_nop(std::shared_ptr<client> cl) {
-	auto s = cl->stream();
-	s << svc_nop;
-	s.flush();
+	auto& s = cl->stream();
+	s.tcp_send(svc_nop);
+	cl->tcp_flush(s);
 }
 
 void sv_kick(std::shared_ptr<client> cl, const char* reason) {
 	if (!reason)
 		reason = "Kicked from server";
-	auto s = cl->stream();
-	s << svc_exit;
-	s << reason;
-	s.flush();
+	auto& s = cl->stream();
+	s.tcp_send(svc_exit);
+	s.tcp_send(reason, strlen(reason) + 1);
+	cl->tcp_flush(s);
 	con_printf("Kicked %s: %s\n", cl->addr().c_str(), reason);
 	// Remove the client from the client vector
 	// This removes the main reference to the client, causing it to be freed once all references have subsided
@@ -47,8 +48,8 @@ void sv_printf(std::shared_ptr<client> cl, const char* format, ...) {
 	vsprintf_s(text, format, ap);
 	va_end(ap);
 
-	auto s = cl->stream();
-	s << svc_print;
-	s << (const char*)text;
-	s.flush();
+	auto& s = cl->stream();
+	s.tcp_send(svc_print);
+	s.tcp_send(text, strlen(text) + 1);
+	cl->tcp_flush(s);
 }

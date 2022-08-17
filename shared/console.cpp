@@ -37,6 +37,8 @@ static bool sv_con_isrcon() {
 }
 #endif
 
+#include "messages.h"
+
 // This method provides logging functionality for echoing to client
 void con_printf(const char* format, ...) {
 	static char text[1024];
@@ -62,10 +64,10 @@ void con_printf(const char* format, ...) {
 	if (_con_log.size()) {
 		cl = _con_log.front().lock();
 		if (cl) {
-			auto s = cl->stream();
-			s << svc_print;
-			s << (const char*)text;
-			s.flush();
+			auto& s = cl->stream();
+			s.tcp_send(svc_print);
+			s.tcp_send(text, strlen(text) + 1);
+			cl->tcp_flush(s);
 			// HACK
 			// Output is too fast because we don't have any buffered stream output
 			Sleep(1);

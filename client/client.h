@@ -25,8 +25,6 @@ public:
 
 	bool is_open() const;
 
-	stream stream();
-
 	std::string addr() const;
 
 	void close();
@@ -39,10 +37,20 @@ public:
 		return _ext;
 	}
 
+	// Handle input buffer
+	void update();
+
+	stream& stream() {
+		return _stream;
+	}
+
 private:
-	SOCKET _so;
+	SOCKET _tcp, _udp;
+	// Destination address
+	// Used both by TCP and UDP
 	struct sockaddr_in _addr;
 	client_ext _ext;
+	class stream _stream;
 };
 
 client& get_client();
