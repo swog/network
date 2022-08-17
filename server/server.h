@@ -38,7 +38,7 @@ public:
 	client(SOCKET so, struct sockaddr_in addr);
 
 	stream stream() {
-		return {*this};
+		return *this;
 	}
 
 	void close();

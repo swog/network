@@ -56,7 +56,7 @@ bool client::is_open() const {
 }
 
 stream client::stream() {
-	return {*this};
+	return *this;
 }
 
 std::string client::addr() const {

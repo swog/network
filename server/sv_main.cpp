@@ -5,7 +5,7 @@
 
 #define SERVER_PORT 1215
 #define SERVER_MAXCON 8
-#define SERVER_NAME "The CUM Kingdom"
+#define SERVER_NAME "Example Server"
 #define SERVER_MOTD "Sample MOTD\n"
 #define SERVER_TIMEOUT 20
 
