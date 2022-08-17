@@ -3,12 +3,12 @@
 #include "console.h"
 #include "net.h"
 
-static void clc_nop_f(server& sv, size_t cmd, std::shared_ptr<client>& cl) {
+static void clc_nop_f(server& sv, size_t cmd, std::shared_ptr<client> cl) {
 }
 
 // exit message from client
 // no custom message
-static void clc_exit_f(server& sv, size_t cmd, std::shared_ptr<client>& cl) {
+static void clc_exit_f(server& sv, size_t cmd, std::shared_ptr<client> cl) {
 	con_printf("Client disconnected: %s\n", cl->addr().c_str());
 	sv.remove(cl);
 }
@@ -20,7 +20,14 @@ std::vector<clc_msgfn>& clc_messages() {
 	return msgs;
 }
 
-void sv_kick(std::shared_ptr<client>& cl, const char* reason) {
+// Send a NOP to keep alive
+void sv_nop(std::shared_ptr<client> cl) {
+	auto s = cl->stream();
+	s << svc_nop;
+	s.flush();
+}
+
+void sv_kick(std::shared_ptr<client> cl, const char* reason) {
 	if (!reason)
 		reason = "Kicked from server";
 	auto s = cl->stream();
@@ -33,7 +40,7 @@ void sv_kick(std::shared_ptr<client>& cl, const char* reason) {
 	get_server().remove(cl);
 }
 
-void sv_printf(std::shared_ptr<client>& cl, const char* format, ...) {
+void sv_printf(std::shared_ptr<client> cl, const char* format, ...) {
 	static char text[1024];
 	va_list ap;
 	va_start(ap, format);

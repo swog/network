@@ -15,7 +15,6 @@ static void svc_exit_f(client& cl, size_t cmd) {
 	std::string reason;
 	cl.stream() >> reason;
 	con_printf("Connection closing: %s\n", reason.c_str());
-	get_console().set_open(0);
 	cl.close();
 }
 
@@ -55,4 +54,21 @@ std::vector<svc_msgfn>& svc_messages() {
 		svc_print_f, svc_serverinfo_f
 	};
 	return msgs;
+}
+
+// Send a NOP to keep alive
+void cl_nop() {
+	auto& cl = get_client();
+	auto s = cl.stream();
+	s << clc_nop;
+	s.flush();
+}
+
+// Send an exit, reasons aren't allowed
+void cl_exit() {
+	auto& cl = get_client();
+	auto s = cl.stream();
+	s << clc_exit;
+	s.flush();
+	cl.close();
 }

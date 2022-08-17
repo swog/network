@@ -3,8 +3,7 @@
 class stream {
 public:
 	~stream();
-	stream();
-	stream(SOCKET so);
+	stream(class client& cl);
 
 	int send(const void* src, size_t size);
 	int recv(void* dst, size_t size);
@@ -22,24 +21,13 @@ public:
 			_outbuf.push_back(((const byte*)&val)[i]);
 	}
 
-	void operator<<(const std::string& str) {
-		for (const auto& ch : str)
-			_outbuf.push_back(ch);
-		_outbuf.push_back(0);
-	}
+	void operator<<(const std::string& str);
+	void operator<<(const char* str);
 
-	void operator<<(const char* str) {
-		size_t size = strlen(str) + 1;
-		for (size_t i = 0; i < size; i++)
-			_outbuf.push_back(str[i]);
-	}
-
-	void flush() {
-		send(_outbuf.data(), _outbuf.size());
-		_outbuf.clear();
-	}
+	void flush();
 
 private:
 	SOCKET _so;
 	std::vector<unsigned char> _outbuf;
+	client& _cl;
 };

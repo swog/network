@@ -1,15 +1,16 @@
 #include "stdafx.h"
+#ifdef _SERVER
+#include "server.h"
+#else
+#include "client.h"
+#endif
 
 stream::~stream() {
 	_so = INVALID_SOCKET;
 }
 
-stream::stream() {
-	_so = INVALID_SOCKET;
-}
-
-stream::stream(SOCKET so) {
-	_so = so;
+stream::stream(client& cl) : _cl(cl) {
+	_so = cl._so;
 }
 
 int stream::send(const void* src, size_t size) {
@@ -31,4 +32,24 @@ int stream::operator>>(std::string& str) {
 		str += ch;
 	}
 	return (int)str.size();
+}
+
+void stream::operator<<(const std::string& str) {
+	for (const auto& ch : str)
+		_outbuf.push_back(ch);
+	_outbuf.push_back(0);
+}
+
+void stream::operator<<(const char* str) {
+	size_t size = strlen(str) + 1;
+	for (size_t i = 0; i < size; i++)
+		_outbuf.push_back(str[i]);
+}
+
+void stream::flush() {
+	send(_outbuf.data(), _outbuf.size());
+	_outbuf.clear();
+
+	// Shared magic
+	_cl.ext().last_send = time(NULL);
 }

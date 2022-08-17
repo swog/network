@@ -7,6 +7,7 @@
 #define SERVER_MAXCON 8
 #define SERVER_NAME "The CUM Kingdom"
 #define SERVER_MOTD "Sample MOTD\n"
+#define SERVER_TIMEOUT 20
 
 // global to get server reference
 server& get_server() {
@@ -26,7 +27,7 @@ serverinfodata& get_serverinfo() {
 }
 
 // on connection callback for server
-static void sv_oncon(server& sv, std::shared_ptr<client>& cl) {
+static void sv_oncon(server& sv, std::shared_ptr<client> cl) {
 	con_printf("Client %s connected\n", cl->addr().c_str());
 	
 	if (!sv_inwhitelist(cl->addr().c_str())) {
@@ -61,18 +62,31 @@ int main(int argc, char **argv) {
 
 	int num = 0;
 	size_t cmd;
-	stream s;
 	const auto& messages = clc_messages();
+	time_t tim;
 
 	while (sv.is_open()) {
-		console::flush();
 		sv.update();
 
 		for (size_t i = 0; i < sv.size(); i++) {
 			auto& con = sv[i];
-			s = con->stream();
+			auto s = con->stream();
 			cmd = 0;
 			num = s >> cmd;
+			tim = time(NULL);
+			// Send NOP if client is about to timeout
+			// Send it here to ensure that it gets sent even if we havent recv in a while.
+			if (tim - con->ext().last_send >= SERVER_TIMEOUT - 10)
+				sv_nop(con);
+			if (num <= 0) {
+				// If there's no bytes read, and its timed out: kick.
+				if (tim - con->ext().last_recv >= SERVER_TIMEOUT)
+					sv_kick(con, "Timed out");
+				continue;
+			}
+			// We received a byte
+			con->ext().last_recv = time(NULL);
+			// Number of bytes isnt the size of a command, wait...
 			if (num != sizeof(cmd))
 				continue;
 			if (cmd >= messages.size()) {
@@ -81,7 +95,7 @@ int main(int argc, char **argv) {
 			}
 			messages[cmd](sv, cmd, con);
 		}
-	}
 
-	console::flush();
+		console::flush();
+	}
 }

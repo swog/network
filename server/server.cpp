@@ -3,7 +3,6 @@
 #include "whitelist.h"
 
 server::~server() {
-	stream s;
 	for (auto& cl : _cons) {
 		sv_kick(cl, "Server shutting down");
 	}
@@ -81,7 +80,7 @@ client& server::operator>>(client& cli) {
 	return cli;
 }
 
-void server::remove(std::shared_ptr<client>& cl) {
+void server::remove(std::shared_ptr<client> cl) {
 	_cons.erase(std::remove(_cons.begin(), _cons.end(), cl));
 }
 
@@ -94,13 +93,16 @@ client::client() {
 client::client(SOCKET so, sockaddr_in addr) {
 	_so = so;
 	_addr = addr;
-	_uid = -1 ^ time(NULL);
+	auto tim = time(NULL);
+	ext().last_recv = ext().last_send = tim;
+	_uid = -1 ^ tim;
 }
 
 void client::close() {
 	if (_so != INVALID_SOCKET)
 		closesocket(_so);
 	_so = INVALID_SOCKET;
+	_uid = 0;
 	ZeroMemory(&_addr, sizeof(_addr));
 }
 

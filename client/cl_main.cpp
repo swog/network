@@ -2,6 +2,8 @@
 #include "client.h"
 #include "console.h"
 
+#define SERVER_TIMEOUT 20
+
 client& get_client() {
 	static client cl;
 	return cl;
@@ -29,6 +31,16 @@ int main() {
 		console::flush();
 		cmd = 0;
 		num = s >> cmd;
+		if (time(NULL) - cl.ext().last_send >= SERVER_TIMEOUT - 10)
+			cl_nop();
+		if (!num) {
+			if (time(NULL) - cl.ext().last_recv >= SERVER_TIMEOUT) {
+				con_printf("Server timed out\n");
+				cl_exit();
+			}
+			continue;
+		}
+		cl.ext().last_recv = time(NULL);
 		if (num != sizeof(cmd))
 			continue;
 		if (cmd >= messages.size()) {

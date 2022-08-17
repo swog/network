@@ -42,6 +42,8 @@ void client::connect(const char* ip, int port) {
 		close();
 		return;
 	}
+
+	ext().last_recv = ext().last_send = time(NULL);
 }
 
 void client::nonblocking(bool nb) {
@@ -54,7 +56,7 @@ bool client::is_open() const {
 }
 
 stream client::stream() {
-	return {_so};
+	return {*this};
 }
 
 std::string client::addr() const {

@@ -14,7 +14,7 @@ static bool _con_rcon_exec = false;
 static std::queue<std::weak_ptr<client>> _con_log;
 
 // Set log client thru svc_print
-void sv_con_log(std::shared_ptr<client>& cl) {
+void sv_con_log(std::shared_ptr<client> cl) {
 	_con_log.push(cl);
 }
 
@@ -440,15 +440,20 @@ void console::console_thread(console* con) {
 			if (rec->EventType != KEY_EVENT)
 				continue;
 			if (rec->Event.KeyEvent.bKeyDown) {
-				if (rec->Event.KeyEvent.wVirtualKeyCode == VK_UP)
+				switch (rec->Event.KeyEvent.wVirtualKeyCode) {
+				case VK_UP:
 					con->uparrow();
-				else if (rec->Event.KeyEvent.wVirtualKeyCode == VK_DOWN)
+					break;
+				case VK_DOWN:
 					con->downarrow();
-				else if (rec->Event.KeyEvent.wVirtualKeyCode == VK_LEFT)
+					break;
+				case VK_LEFT:
 					con->leftarrow();
-				else if (rec->Event.KeyEvent.wVirtualKeyCode == VK_RIGHT)
+					break;
+				case VK_RIGHT:
 					con->rightarrow();
-				else {
+					break;
+				default:
 					ch = rec->Event.KeyEvent.uChar.AsciiChar;
 
 					switch (ch) {
@@ -485,8 +490,9 @@ void console::exec(const char* cmdstr) {
 // Execute and flush commands
 // Called from the main thread
 void console::flush() {
+	// Wait for the queue
 	std::lock_guard<std::mutex> lock(_queue_mut);
-	while (_queue.size()) {
+	while (!_queue.empty()) {
 		auto& args = _queue.front();
 		if (args.cmd)
 			args.cmd->execute(args);

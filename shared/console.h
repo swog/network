@@ -17,7 +17,7 @@ typedef void (*console_commandfn)(class command_args& args);
 
 #ifdef _SERVER
 // Set log client thru svc_print
-void sv_con_log(std::shared_ptr<client>& cl);
+void sv_con_log(std::shared_ptr<client> cl);
 void sv_con_unlog();
 
 void sv_con_setrcon(bool rcon);
@@ -217,15 +217,19 @@ public:
 	void set_open(bool open);
 
 private:
-	HANDLE _hinput;
-	INPUT_RECORD _record[64];
-	std::vector<std::string> _inputrecord;
-	std::thread _thread;
-	char _input[64];
-	bool _open;
-	std::mutex _open_mut;
-	size_t _cursor;
-	size_t _line;	// Line number
+	HANDLE						_hinput;
+
+	INPUT_RECORD				_record[64];
+	std::vector<std::string>	_inputrecord;
+
+	std::thread					_thread;
+	char						_input[64];
+
+	bool						_open;
+	std::mutex					_open_mut;
+
+	size_t						_cursor;
+	size_t						_line;	// Line number
 
 	void uparrow();
 	void downarrow();
@@ -240,7 +244,8 @@ private:
 
 	static console_command* find_cmd(const char* name);
 
-	static console_command* _head;
-	static std::mutex _queue_mut;
+	static console_command*			_head;
+
 	static std::queue<command_args> _queue;
+	static std::mutex				_queue_mut;
 };

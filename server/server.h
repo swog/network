@@ -8,6 +8,8 @@ struct client_ext {
 	client_ext() {
 		rcon_attempts = 0;
 		rcon_authed = 0;
+		last_recv = 0;
+		last_send = 0;
 	}
 
 	// RCON system
@@ -15,6 +17,8 @@ struct client_ext {
 	static constexpr const size_t rcon_maxattempts = 3;
 
 	bool rcon_authed;
+	time_t last_recv;	// Last packet received
+	time_t last_send;
 };
 
 // Server's client instance
@@ -23,6 +27,7 @@ struct client_ext {
 //	Some methods are inline so that they are more efficient.
 class client {
 public:
+	friend class stream;
 	friend class server;
 
 	~client() {
@@ -33,7 +38,7 @@ public:
 	client(SOCKET so, struct sockaddr_in addr);
 
 	stream stream() {
-		return {_so};
+		return {*this};
 	}
 
 	void close();
@@ -44,15 +49,15 @@ public:
 
 	std::string addr() const;
 
-	const client_ext& ext() const {
+	const auto& ext() const {
 		return _ext;
 	}
 
-	client_ext& ext() {
+	auto& ext() {
 		return _ext;
 	}
 
-	const size_t& uid() const {
+	const auto& uid() const {
 		return _uid;
 	}
 
@@ -67,7 +72,7 @@ private:
 						// So we create one based on the connection time
 };
 
-typedef void (*clc_confn)(class server& sv, std::shared_ptr<client>& cl);
+typedef void (*clc_confn)(class server& sv, std::shared_ptr<client> cl);
 
 // Server instance object over TCP
 //	The server cannot rebind to a different port.
@@ -104,17 +109,28 @@ public:
 
 	client& operator>>(client& cli);
 	// Remove client from connection list
-	void remove(std::shared_ptr<client>& cl);
+	void remove(std::shared_ptr<client> cl);
 
-	size_t size() const {
+	// Safe loop if a client was removed.
+	auto begin() {
+		return _cons.begin();
+	}
+
+	auto end() {
+		return _cons.end();
+	}
+
+	// Backwards compatible, but also for using an index to reference a client.
+	// This was used by sv_kick, and commands that take a client as an argument.
+	auto size() const {
 		return _cons.size();
 	}
 
-	const std::shared_ptr<client>& operator[](size_t i) const {
+	auto& operator[](size_t i) {
 		return _cons[i];
 	}
 
-	std::shared_ptr<client>& operator[](size_t i) {
+	const auto& operator[](size_t i) const {
 		return _cons[i];
 	}
 

@@ -15,7 +15,7 @@ CONSOLE_VAR_CHANGE(rcon_password, "Set remote console password", fcommand_hideva
 }
 
 // Received rcon command from client
-void clc_rcon_f(server& sv, size_t cmd, std::shared_ptr<client>& cl) {
+void clc_rcon_f(server& sv, size_t cmd, std::shared_ptr<client> cl) {
 	std::string cmdstr;
 	cl->stream() >> cmdstr;
 	// Make sure authenticated
@@ -33,7 +33,7 @@ void clc_rcon_f(server& sv, size_t cmd, std::shared_ptr<client>& cl) {
 // TODO make a refactored library for this mess
 //	the only thing is that i dont know a good way of blending client and server when they are fundamentally split through the client/server model
 //	In other words, i'd need to restructure net messages so that they can be defined in other files, rather than being restricted to *_messages.cpp declarations
-void clc_rcon_password_f(server& sv, size_t cmd, std::shared_ptr<client>& cl) {
+void clc_rcon_password_f(server& sv, size_t cmd, std::shared_ptr<client> cl) {
 	auto s = cl->stream();
 	size_t size = 0;
 	s >> size;

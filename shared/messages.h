@@ -39,22 +39,31 @@ enum svc_message : size_t {
 };
 
 typedef void (*svc_msgfn)(class client& cl, size_t cmd);
-typedef void (*clc_msgfn)(class server& sv, size_t cmd, std::shared_ptr<client>& cl);
+typedef void (*clc_msgfn)(class server& sv, size_t cmd, std::shared_ptr<client> cl);
 
 serverinfodata& get_serverinfo();
 
 #ifdef _SERVER
 // Receive RCON command
-void clc_rcon_f(server& sv, size_t cmd, std::shared_ptr<client>& cl);
+void clc_rcon_f(server& sv, size_t cmd, std::shared_ptr<client> cl);
 // Receive RCON password
-void clc_rcon_password_f(class server& sv, size_t cmd, std::shared_ptr<client>& cl);
+void clc_rcon_password_f(class server& sv, size_t cmd, std::shared_ptr<client> cl);
 
 std::vector<clc_msgfn>& clc_messages();
 
+// Send a NOP to keep alive
+void sv_nop(std::shared_ptr<client> cl);
+
 // Kick client, newline is included on the client's end.
-void sv_kick(std::shared_ptr<client>& cl, const char* reason = NULL);
+void sv_kick(std::shared_ptr<client> cl, const char* reason = NULL);
 // Does not print a newline character on the client, so include it.
-void sv_printf(std::shared_ptr<client>& cl, const char* format, ...);
+void sv_printf(std::shared_ptr<client> cl, const char* format, ...);
 #else
 std::vector<svc_msgfn>& svc_messages();
+
+// Send a NOP to keep alive
+void cl_nop();
+
+// Send an exit, reasons aren't allowed
+void cl_exit();
 #endif
