@@ -26,21 +26,23 @@ int main() {
 	size_t cmd;
 	int num;
 	const auto& messages = svc_messages();
+	time_t tim;
 
 	while (cl.is_open()) {
 		console::flush();
 		cmd = 0;
 		num = s >> cmd;
-		if (time(NULL) - cl.ext().last_send >= SERVER_TIMEOUT - 10)
+		tim = time(NULL);
+		if (tim - cl.ext().last_send >= SERVER_TIMEOUT - 10)
 			cl_nop();
 		if (!num) {
-			if (time(NULL) - cl.ext().last_recv >= SERVER_TIMEOUT) {
+			if (tim - cl.ext().last_recv >= SERVER_TIMEOUT) {
 				con_printf("Server timed out\n");
 				cl_exit();
 			}
 			continue;
 		}
-		cl.ext().last_recv = time(NULL);
+		cl.ext().last_recv = tim;
 		if (num != sizeof(cmd))
 			continue;
 		if (cmd >= messages.size()) {

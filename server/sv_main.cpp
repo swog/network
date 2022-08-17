@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 				continue;
 			}
 			// We received a byte
-			con->ext().last_recv = time(NULL);
+			con->ext().last_recv = tim;
 			// Number of bytes isnt the size of a command, wait...
 			if (num != sizeof(cmd))
 				continue;
