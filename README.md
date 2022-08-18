@@ -1,4 +1,7 @@
+# This readme is outdated: see client/cl_main.cpp, server/sv_main.cpp for client and server handling
+
 # network
+
 Nonblocking server and client with nonblocking console input for Windows.
 Originally a network system that was built upon as an example.
 
