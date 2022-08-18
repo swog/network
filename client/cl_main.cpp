@@ -21,12 +21,10 @@ int main() {
 	auto& s = cl.stream();
 	// set nonblocking after connect
 	cl.nonblocking(1);
-	// Initialize nonblocking console
-	get_console();
 
 	const auto& messages = svc_messages;
 
-	while (cl.is_open()) {
+	while (get_console().is_open()) {
 		console::flush();
 		cl.update();
 	}

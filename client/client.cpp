@@ -88,6 +88,8 @@ void client::close() {
 
 // Handle input buffer
 void client::update() {
+	if (!is_open())
+		return;
 	_stream.update();
 	size_t cmd = 0, num = 0;
 	num = _stream.tcp_recv(cmd);

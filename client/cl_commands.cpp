@@ -7,14 +7,9 @@
 // clientside exit command
 // notify server
 CONSOLE_COMMAND(exit, "Close program", 0) {
-	auto& cl = get_client();
-	auto& s = cl.stream();
-
-	s.tcp_send(clc_exit);
-	s.tcp_flush();
-
+	cl_exit();
+	get_client().close();
 	get_console().set_open(0);
-	cl.close();
 }
 
 CONSOLE_COMMAND(rcon_password, "Authenticate with server", 0) {
@@ -29,7 +24,7 @@ CONSOLE_COMMAND(rcon_password, "Authenticate with server", 0) {
 	s.tcp_send(size);
 	net_send_xor(s, args[1].c_str(), size,
 		RCON_PASS_KEY, RCON_PASS_KEY_SIZE);
-	s.flush();
+	s.tcp_flush();
 }
 
 CONSOLE_COMMAND(rcon, "Type rcon for help", 0) {
@@ -42,7 +37,7 @@ CONSOLE_COMMAND(rcon, "Type rcon for help", 0) {
 	auto& s = get_client().stream();
 	s.tcp_send(clc_rcon);
 	s.tcp_send(args.argstr);
-	s.flush();
+	s.tcp_flush();
 }
 
 CONSOLE_COMMAND(status, "Display connection information", 0) {
@@ -51,5 +46,25 @@ CONSOLE_COMMAND(status, "Display connection information", 0) {
 	con_printf("Server name: %s\n", svi.name.c_str());
 	con_printf("Num clients: %llu\n", svi.numclients);
 	con_printf("Max clients: %llu\n", svi.maxclients);
-	con_printf("MOTD: %s", svi.motd.c_str());
+	con_printf("MOTD: %s\n", svi.motd.c_str());
+}
+
+CONSOLE_COMMAND(disconnect, "Disconnect from server", 0) {
+	con_printf("Disconnected from server\n");
+	auto& cl = get_client();
+	cl_exit();
+	auto& svi = get_serverinfo();
+	svi.name = svi.motd = "";
+	svi.numclients = svi.maxclients = 0;
+}
+
+CONSOLE_COMMAND(connect, "Connect to server", 0) {
+	if (args.size() < 3) {
+		con_printf("Usage: connect <ip> <port>\n");
+		return;
+	}
+	auto& cl = get_client();
+	cl.nonblocking(0);
+	cl.connect(args[1].c_str(), atoi(args[2].c_str()));
+	cl.nonblocking(1);
 }

@@ -23,8 +23,8 @@ CONSOLE_COMMAND(exec, "Execute command on client", 0) {
 
 // Exit command to close server
 CONSOLE_COMMAND(exit, "Close program", 0) {
-	get_console().set_open(0);
 	get_server().close();
+	get_console().set_open(0);
 }
 
 CONSOLE_COMMAND(kick, "Remove client from server with an optional reason", 0) {

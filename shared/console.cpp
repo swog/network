@@ -356,11 +356,14 @@ void console::rightarrow() {
 
 void console::newline() {
 	printf("\n");
+	printf("> %s\n", _input);
+
+	if (!_cursor)
+		return;
 
 	_inputrecord.push_back(_input);
 	_line++;
 
-	printf("> %s\n", _input);
 	exec(_input);
 
 	_cursor = 0;

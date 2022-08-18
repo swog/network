@@ -73,6 +73,8 @@ void server::close() {
 #define SERVER_TIMEOUT 20
 
 void server::update() {
+	if (!is_open())
+		return;
 	struct sockaddr_in addr;
 	int addrlen = sizeof(addr);
 	SOCKET so = accept(_tcp, (sockaddr*)&addr, &addrlen);

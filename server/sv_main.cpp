@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
 	const auto& messages = clc_messages;
 
-	while (sv.is_open()) {
+	while (get_console().is_open()) {
 		console::flush();
 		sv.update();
 	}
