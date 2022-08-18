@@ -4,10 +4,8 @@
 #include "messages.h"
 
 server::~server() {
-	for (auto& cl : _cons)
-		sv_kick(cl, "Server shutting down");
-
-	_cons.clear();
+	while (_cons.size())
+		sv_kick(_cons.back(), "Connection closing");
 
 	close();
 	WSACleanup();
