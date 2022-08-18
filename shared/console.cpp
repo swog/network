@@ -70,7 +70,7 @@ void con_printf(const char* format, ...) {
 			cl->tcp_flush(s);
 			// HACK
 			// Output is too fast because we don't have any buffered stream output
-			Sleep(1);
+			Sleep(2);
 		}
 	}
 #endif
@@ -89,14 +89,17 @@ CONSOLE_COMMAND(list, "List all available commands", 0) {
 	}
 	static char format_string[32];
 	sprintf_s(format_string, "%%%us - %%s\n", width);
-	for (console_command* com = console::_head; com; com = com->_next) {
+	for (console_command* com = console::_head; com; com = com->_next)
 		con_printf(format_string, com->name(), com->help());
-	}
 }
 
 // Echo command to print a string to console
 CONSOLE_COMMAND(echo, "Print to console", 0) {
 	con_printf("%s\n", args.argstr.c_str());
+}
+
+CONSOLE_COMMAND(clear, "Clear console", 0) {
+	system("cls");
 }
 
 //=============================================================================

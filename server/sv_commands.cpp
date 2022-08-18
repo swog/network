@@ -5,7 +5,7 @@
 
 CONSOLE_COMMAND(exec, "Execute command on client", 0) {
 	if (args.argv.size() < 3) {
-		con_printf("Usage: exec <index> \"<command>\"");
+		con_printf("Usage: exec <index> <command>");
 		return;
 	}
 	auto& sv = get_server();
@@ -17,7 +17,7 @@ CONSOLE_COMMAND(exec, "Execute command on client", 0) {
 	auto& cl = sv[index];
 	auto& s = cl->stream();
 	s.tcp_send(svc_exec);
-	s.tcp_send(args[2]);
+	s.tcp_send(args.argstr.substr(args[1].size() + 1));
 	cl->tcp_flush(s);
 }
 

@@ -23,7 +23,6 @@ NET_MESSAGE_TCP(svc_exit) {
 NET_MESSAGE_TCP(svc_exec) {
 	std::string cmdstr;
 	cl.stream().tcp_recv(cmdstr);
-	con_printf("Executing command from server: %s\n", cmdstr.c_str());
 	console::exec(cmdstr.c_str());
 }
 
