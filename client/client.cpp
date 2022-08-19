@@ -4,7 +4,7 @@
 #include "messages.h"
 
 client::~client() {
-	close();
+	cl_exit();
 	WSACleanup();
 }
 
@@ -19,8 +19,7 @@ client::client(const char* ip, int port) {
 
 // connect client to server
 void client::connect(const char* ip, int port) {
-	_tcp = INVALID_SOCKET;
-	_udp = INVALID_SOCKET;
+	_tcp = _udp = INVALID_SOCKET;
 	ZeroMemory(&_addr, sizeof(_addr));
 
 	WSADATA data;

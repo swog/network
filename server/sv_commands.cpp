@@ -4,7 +4,7 @@
 #include "messages.h"
 
 CONSOLE_COMMAND(exec, "Execute command on client", 0) {
-	if (args.argv.size() < 3) {
+	if (args.size() < 3) {
 		con_printf("Usage: exec <index> <command>");
 		return;
 	}

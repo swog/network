@@ -43,9 +43,8 @@ NET_MESSAGE_TCP(svc_serverinfo) {
 
 	con_printf("Connected to %s\n", svi.name.c_str());
 
-	if (svi.motd.size()) {
+	if (svi.motd.size())
 		con_printf("MOTD: %s", svi.motd.c_str());
-	}
 }
 
 std::vector<net_message*> svc_messages = {
