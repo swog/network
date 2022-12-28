@@ -16,6 +16,8 @@ static void whitelist_init() {
 	std::ifstream ifs("whitelist.txt");
 	static char line[64];
 
+	line[63] = 0;
+
 	while (ifs.good()) {
 		ifs.getline(line, sizeof(line) - 1);
 		_whitelist.push_back(line);

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "server.h"
 #include "whitelist.h"
-#include "messages.h"
 
 server::~server() {
 	while (_cons.size())

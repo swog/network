@@ -21,21 +21,26 @@ typedef struct {
 	size_t maxclients;
 } serverinfodata;
 
+typedef struct {
+	std::string name;
+} clientinfodata;
+
 // Client->Server packets
 enum clc_message : size_t {
-	clc_nop,	// Updates last received packet time
-	clc_exit,	// Client has closed the connection
-	clc_rcon,	// Execute command on server, requires authentication
-	clc_rcon_password, // RCON password
+	clc_nop,			// Updates last received packet time
+	clc_exit,			// Client has closed the connection
+	clc_rcon,			// Execute command on server, requires prior auth
+	clc_rcon_password,
+	clc_clientinfo,
 };
 
 // Server->Client packets
 enum svc_message : size_t {
-	svc_nop,	// Updates last received packet time
-	svc_exit,	// Server has closed the connection
-	svc_exec,	// Execute command on client
-	svc_print,	// Print message
-	svc_serverinfo,	// Server information
+	svc_nop,		// Updates last received packet time
+	svc_exit,		// Server has closed the connection
+	svc_exec,		// Execute command on client
+	svc_print,
+	svc_serverinfo,	// Server name, MOTD.
 };
 
 class net_message {
@@ -112,6 +117,8 @@ DECLARE_NET_MESSAGE(clc_rcon_password);
 #define net_messages clc_messages
 
 extern std::vector<net_message*> clc_messages;
+
+class client;
 
 // Send a NOP to keep alive
 void sv_nop(std::shared_ptr<client> cl);

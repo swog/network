@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "console.h"
 #include "server.h"
-#include "messages.h"
 #include "net.h"
 
 CONSOLE_VAR_CHANGE(rcon_password, "Set remote console password", fcommand_hidevalue, "") {

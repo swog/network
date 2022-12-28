@@ -19,6 +19,8 @@ struct client_ext {
 	bool rcon_authed;
 	time_t last_recv;	// Last packet received
 	time_t last_send;
+
+	clientinfodata client_data;
 };
 
 // Server's client instance

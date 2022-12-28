@@ -21,9 +21,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\stream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cl_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -42,15 +39,15 @@
     <ClCompile Include="..\shared\net.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\messages.h">
@@ -63,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\net.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

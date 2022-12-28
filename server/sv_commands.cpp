@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "console.h"
 #include "server.h"
-#include "messages.h"
 
 CONSOLE_COMMAND(exec, "Execute command on client", 0) {
 	if (args.size() < 3) {

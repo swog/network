@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "server.h"
 #include "console.h"
-#include "messages.h"
 #include "net.h"
 
 NET_MESSAGE_TCP(clc_nop) {
@@ -14,11 +13,19 @@ NET_MESSAGE_TCP(clc_exit) {
 	sv.remove(cl);
 }
 
+NET_MESSAGE_TCP(clc_clientinfo) {
+	auto& s = cl->stream();
+	auto& cli = cl->ext().client_data;
+	s.tcp_recv(cli.name);
+	cl->tcp_flush(s);
+}
+
 std::vector<net_message*> clc_messages = {
 	(net_message*)&clc_nop_inst,
 	(net_message*)&clc_exit_inst,
 	(net_message*)&clc_rcon_inst,
-	(net_message*)&clc_rcon_password_inst
+	(net_message*)&clc_rcon_password_inst,
+	(net_message*)&clc_clientinfo_inst,
 };
 
 // Send a NOP to keep alive

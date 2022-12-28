@@ -35,6 +35,8 @@ static bool sv_con_isrcon() {
 	std::lock_guard<std::mutex> lock(_con_rcon_exec_mut);
 	return _con_rcon_exec;
 }
+#else
+#include "client.h"
 #endif
 
 #include "messages.h"
@@ -239,13 +241,19 @@ static void console_var_f(command_args& args) {
 
 	auto& var = (console_var&)*args.cmd;
 
-	if (args.argv.size() > 1) {
-		var.set_value(args.argv[1]);
+	if (args.size() > 1) {
+		// Constant during session flag
+#ifdef _SERVER
+		if (!var.has_flag(fcommand_constsesh) || get_server().is_open())
+#else
+		if (!var.has_flag(fcommand_constsesh) || get_client().is_open())
+#endif
+			var.set_value(args[1]);
 	}
 	else {
 		// This is the only way to access the value of a variable as of now.
 		// Hide special ones.
-		if (var.flags() & fcommand_hidevalue)
+		if (var.has_flag(fcommand_hidevalue))
 			con_printf("%s = \"****\"\n", var.name());
 		else
 			con_printf("%s = \"%s\"\n", var.name(), var.get_cstr());

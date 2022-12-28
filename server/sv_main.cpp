@@ -2,7 +2,6 @@
 #include "server.h"
 #include "console.h"
 #include "whitelist.h"
-#include "messages.h"
 
 #define SERVER_PORT 1215
 #define SERVER_MAXCON 8

@@ -12,3 +12,4 @@
 #include <queue>
 #include "stream.h"
 #include "crypt.h"
+#include "messages.h"

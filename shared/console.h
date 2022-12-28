@@ -28,6 +28,7 @@ void con_printf(const char* format, ...);
 
 enum {
 	fcommand_hidevalue = 1,	// Hide the value of a console variable
+	fcommand_constsesh,	// Dont allow value changes during a session
 };
 
 // More accurately a command execution packet
@@ -106,6 +107,10 @@ public:
 	void execute(command_args& args) {
 		if (_fn)
 			_fn(args);
+	}
+
+	bool has_flag(size_t flags) const {
+		return !!(_flags & flags);
 	}
 
 private:
