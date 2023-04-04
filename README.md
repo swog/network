@@ -10,9 +10,10 @@ Note that there are many additions made to apply the networking library. For exa
 Socket errors are printed to stdout.
 
 There are a few features:
+
 	A remote console system to send commands to client or server.
-	Console commands
-	Server connection daemon
+	Console commands.
+	Server connection daemon.
 
 ## shared
 As far as shared goes, these are only headers and source files included in both the server and client.
