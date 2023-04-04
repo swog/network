@@ -14,6 +14,7 @@ There are a few features:
 	A remote console system to send commands to client or server.
 	Console commands.
 	Server connection daemon.
+	Connection timeout/heartbeat packets.
 
 ## shared
 As far as shared goes, these are only headers and source files included in both the server and client.
