@@ -15,6 +15,7 @@ There are a few features:
 	Console commands.
 	Server connection daemon.
 	Connection timeout/heartbeat packets.
+	Client console command output relayed to server.
 
 ## shared
 As far as shared goes, these are only headers and source files included in both the server and client.
