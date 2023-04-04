@@ -16,6 +16,7 @@ There are a few features:
 	Server connection daemon.
 	Connection timeout/heartbeat packets.
 	Remote console command output relayed to sender.
+	MOTD & other packets.
 
 ## shared
 As far as shared goes, these are only headers and source files included in both the server and client.
